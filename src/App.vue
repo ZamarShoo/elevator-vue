@@ -1,7 +1,11 @@
 <template>
 <div class="house">
   <div class="floor-left">
-    <div class="elevator"></div>
+    <div 
+      class="elevator"
+      :class="{elevatorBusy: !elevatorIsFree}"
+      :style="{transition: this.getCoordinate.time + 's', bottom: this.coordinate}"
+    ></div>
     <div
       v-for="n in numberFloors"
       :key="n" 
@@ -21,14 +25,24 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 
 export default {
   name: 'App',
   computed: {
-    ...mapState({
-      numberFloors: state => state.numberFloors
-    }),
+    ...mapState(['numberFloors', 'elevatorIsFree', 'coordinate']),
+    ...mapGetters(['getCoordinate'])
+  },
+  methods: {
+      ...mapActions(['changeFloor', 'nextFloor']),
+    },
+  mounted() {
+    setTimeout(() => {
+      this.changeFloor(5)
+    }, 1000),
+    this.$store.watch(() => this.$store.getters.getCoordinate, (turnFloors) => {
+      this.nextFloor(this.getCoordinate.time)
+    })
   }
 }
 </script>
@@ -66,5 +80,21 @@ export default {
     z-index: 2;
     height: 19vh;
     border-bottom: 1px solid black;
+  }
+
+  .elevatorBusy {
+    animation: busy 1s linear infinite;
+  }
+
+  @keyframes busy {
+    0% {
+      opacity: .5;
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: .5;
+    }
   }
 </style>
