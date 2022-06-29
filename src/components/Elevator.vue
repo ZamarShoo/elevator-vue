@@ -1,7 +1,7 @@
 <template>
     <div 
         class="elevator"
-        :class="{elevatorBusy: !elevatorIsFree}"
+        :class="{elevatorBusy: this.goingUp !== 'up' && this.goingUp !== 'down' && !elevatorIsFree ? true : false}"
         :style="{
             transition: time + 's',
             bottom: this.coordinate
@@ -27,16 +27,20 @@
     }
 </script>
     
-<style>
+<style lang="scss">
 .elevator {
     position: absolute;
     width: 100%;
     height: 19vh;
-    background-color: tomato;
+    background-color: #005eff;
     z-index: 3;
     left: 0;
     bottom: calc(0vh + 1px);
     transition: 1s;
+
+    p {
+        font-size: 18px;
+    }
 }
 .elevatorBusy {
     animation: busy 1s linear infinite;

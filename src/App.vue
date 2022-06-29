@@ -12,13 +12,10 @@
     </div>
   </div>
   <div class="floor-right">
-    <div
-      v-for="n in numberFloors"
-      :key="n" 
-      class="floor">
-        <p class="floor-number">{{n}}</p>
-        <p class="lift-call-button"></p>
-    </div>
+    <floor 
+      :number-floors="this.numberFloors"
+      :turn-floors="this.turnFloors"
+    />
   </div>
 </div>
 </template>
@@ -26,25 +23,25 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex'
 import Elevator from '@/components/Elevator.vue'
+import Floor from '@/components/Floor.vue'
 
 export default {
   name: 'App',
   components: {
-    Elevator
+    Elevator, Floor
   },
   computed: {
-    ...mapState(['numberFloors', 'elevatorIsFree', 'coordinate', 'goingUp']),
+    ...mapState(['numberFloors', 'turnFloors']),
     ...mapGetters(['getCoordinate'])
   },
   methods: {
-      ...mapActions(['changeFloor', 'nextFloor']),
-    },
+      ...mapActions(['nextFloor']),
+  },
   mounted() {
-    setTimeout(() => {
-      this.changeFloor(5)
-    }, 1000),
-    this.$store.watch(() => this.$store.getters.getCoordinate, (turnFloors) => {
-      this.nextFloor(this.getCoordinate.time)
+    this.$store.watch(() => this.$store.getters.getCoordinate, (n) => {
+        if (n.elevatorIsFree) {
+          this.nextFloor(this.getCoordinate.time)
+        }
     })
   }
 }
@@ -60,6 +57,11 @@ export default {
   .floor-right {
     width: 90%;
     border-left: 1px solid black;
+    p {
+      margin: 10px;
+      font-size: 18px;
+      font-weight: bold;
+    }
   }
   .floor-right, .floor-left {
     display: flex;

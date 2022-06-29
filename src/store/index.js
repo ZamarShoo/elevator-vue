@@ -14,11 +14,14 @@ export default createStore({
       if (!!state.turnFloors.length) {
         return {
           time: Math.abs(state.turnFloors[0] - state.currentFloor),
-          toFloor: state.turnFloors[0]
+          toFloor: state.turnFloors[0],
+          elevatorIsFree: state.elevatorIsFree,
         }
       } else {
         return {
-          time: 0
+          time: 0,
+          toFloor: state.currentFloor,
+          elevatorIsFree: true,
         }
       }
     }
@@ -26,14 +29,12 @@ export default createStore({
   mutations: {
     addToTurn(state, floor) {
       state.turnFloors.push(floor)
-      state.turnFloors.push(2)
-      state.turnFloors.push(4)
-      state.turnFloors.push(3)
     },
     inCurrentFloor(state) {     
       if (!!state.turnFloors.length || state.turnFloors.length > 1) {
         state.currentFloor = state.turnFloors.shift()
       }
+      state.elevatorIsFree = true
     }
   },
   actions: {
@@ -44,18 +45,17 @@ export default createStore({
       state.goingUp = 'false'
       new Promise((resolve, reject) => {
         setTimeout(() => {
-          state.elevatorIsFree = true
           resolve();
         }, 3000)
       })
       .then(() => commit('inCurrentFloor'))
     },
     nextFloor({state, dispatch, commit}, time) {
+      state.elevatorIsFree = false
       new Promise((resolve, reject) => {
         state.coordinate = `calc(${(state.turnFloors[0] - 1) * 19}vh + ${state.turnFloors[0]}px)`
         state.goingUp = state.turnFloors[0] < state.currentFloor ? 'down' : 'up'
         setTimeout(() => {
-          state.elevatorIsFree = false
           resolve();
         }, time * 1000)
       })
