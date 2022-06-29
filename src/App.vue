@@ -1,11 +1,10 @@
 <template>
 <div class="house">
   <div class="floor-left">
-    <div 
-      class="elevator"
-      :class="{elevatorBusy: !elevatorIsFree}"
-      :style="{transition: this.getCoordinate.time + 's', bottom: this.coordinate}"
-    ></div>
+    <elevator
+      :time="this.getCoordinate.time"
+      :to-floor="this.getCoordinate.toFloor"
+    />
     <div
       v-for="n in numberFloors"
       :key="n" 
@@ -26,11 +25,15 @@
 
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex'
+import Elevator from '@/components/Elevator.vue'
 
 export default {
   name: 'App',
+  components: {
+    Elevator
+  },
   computed: {
-    ...mapState(['numberFloors', 'elevatorIsFree', 'coordinate']),
+    ...mapState(['numberFloors', 'elevatorIsFree', 'coordinate', 'goingUp']),
     ...mapGetters(['getCoordinate'])
   },
   methods: {
@@ -53,17 +56,6 @@ export default {
   }
   .floor-left {
     width: 10%;
-
-    .elevator {
-      position: absolute;
-      width: 100%;
-      height: 19vh;
-      background-color: tomato;
-      z-index: 1;
-      left: 0;
-      bottom: calc(0vh + 1px);
-      transition: 1s;
-    }
   }
   .floor-right {
     width: 90%;
@@ -80,21 +72,5 @@ export default {
     z-index: 2;
     height: 19vh;
     border-bottom: 1px solid black;
-  }
-
-  .elevatorBusy {
-    animation: busy 1s linear infinite;
-  }
-
-  @keyframes busy {
-    0% {
-      opacity: .5;
-    }
-    60% {
-      opacity: 1;
-    }
-    100% {
-      opacity: .5;
-    }
   }
 </style>
