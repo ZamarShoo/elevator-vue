@@ -5,7 +5,7 @@
       class="floor">
         <p class="floor-number">{{n}}</p>
         <p 
-          @click="this.changeFloor(n)"
+          @click="this.waintingElevator(n)"
           :class="{active: this.turnFloors.includes(n)}"
           class="lift-call-button">
         </p>
@@ -22,6 +22,11 @@
         },
         methods: {
             ...mapActions(['changeFloor']),
+            waintingElevator(floor) {
+                if (!this.turnFloors.includes(floor)) {
+                    this.changeFloor(floor)
+                }
+            }
         },
     }
 </script>

@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import { onUnmounted } from "vue"
 import { mapState, mapGetters, mapActions } from 'vuex'
 import Elevator from '@/components/Elevator.vue'
 import Floor from '@/components/Floor.vue'
@@ -35,15 +36,19 @@ export default {
     ...mapGetters(['getCoordinate'])
   },
   methods: {
-      ...mapActions(['nextFloor']),
+      ...mapActions(['nextFloor', 'saveToStorage', 'getToStorage']),
   },
   mounted() {
+    if(localStorage.data) {
+      this.getToStorage()
+    }
     this.$store.watch(() => this.$store.getters.getCoordinate, (n) => {
         if (n.elevatorIsFree) {
           this.nextFloor(this.getCoordinate.time)
         }
-    })
-  }
+    }),
+    window.addEventListener( 'beforeunload', e => this.saveToStorage() );
+  },
 }
 </script>
 

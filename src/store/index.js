@@ -20,26 +20,30 @@ export default createStore({
       } else {
         return {
           time: 0,
-          toFloor: state.currentFloor,
-          elevatorIsFree: true,
         }
       }
     }
   },
   mutations: {
     addToTurn(state, floor) {
-      state.turnFloors.push(floor)
+      if (Array.isArray(floor)) {
+        state.turnFloors.push(...floor)
+      } else {
+        state.turnFloors.push(floor)
+      }
     },
     inCurrentFloor(state) {     
       if (!!state.turnFloors.length || state.turnFloors.length > 1) {
         state.currentFloor = state.turnFloors.shift()
       }
       state.elevatorIsFree = true
-    }
+    },
   },
   actions: {
     changeFloor({state, commit}, floorTo) {
-      commit('addToTurn', floorTo)
+      if(floorTo !== state.currentFloor) {
+        commit('addToTurn', floorTo)
+      }
     },
     busyElevator({state, commit}) {
       state.goingUp = 'false'
@@ -51,15 +55,37 @@ export default createStore({
       .then(() => commit('inCurrentFloor'))
     },
     nextFloor({state, dispatch, commit}, time) {
-      state.elevatorIsFree = false
-      new Promise((resolve, reject) => {
-        state.coordinate = `calc(${(state.turnFloors[0] - 1) * 19}vh + ${state.turnFloors[0]}px)`
-        state.goingUp = state.turnFloors[0] < state.currentFloor ? 'down' : 'up'
-        setTimeout(() => {
-          resolve();
-        }, time * 1000)
-      })
-      .then(() => dispatch('busyElevator'))
+      console.log()
+      if(state.turnFloors[0] !== state.currentFloor) {
+        state.elevatorIsFree = false
+        new Promise((resolve, reject) => {
+          state.coordinate = state.turnFloors[0] ? `calc(${(state.turnFloors[0] - 1) * 19}vh + ${state.turnFloors[0]}px)` : state.coordinate
+          state.goingUp = state.turnFloors[0] < state.currentFloor ? 'down' : 'up'
+          setTimeout(() => {
+            resolve();
+          }, time * 1000)
+        })
+        .then(() => dispatch('busyElevator'))
+      }
+    },
+    saveToStorage({state}) {
+      const strObj = JSON.stringify(state);
+      localStorage.setItem('data', strObj);
+    },
+    getToStorage({state, dispatch, commit}) {
+      const strObjFromStorage = localStorage.getItem('data')
+      const data = JSON.parse(strObjFromStorage)
+      state.coordinate = data.coordinate
+      state.numberFloors = data.numberFloors
+      state.currentFloor = data.currentFloor
+      state.elevatorIsFree = data.elevatorIsFree
+      state.goingUp = data.goingUp
+      state.turnFloors = data.turnFloors
+      if (state.currentFloor === data.turnFloors[0]) {
+        commit('inCurrentFloor')
+      } else {
+        dispatch('nextFloor', Math.abs(state.turnFloors[0] - state.currentFloor))
+      }
     }
   },
 })
