@@ -22,6 +22,9 @@ export default createStore({
           time: 0,
         }
       }
+    },
+    heightFloors(state) {
+      return 100 / state.numberFloors - 1
     }
   },
   mutations: {
@@ -38,6 +41,9 @@ export default createStore({
       }
       state.elevatorIsFree = true
     },
+    setNumberOfFloors(state, floorNumber) {
+      state.numberFloors = floorNumber
+    }
   },
   actions: {
     changeFloor({state, commit}, floorTo) {

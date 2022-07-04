@@ -4,7 +4,8 @@
         :class="{elevatorBusy: this.goingUp !== 'up' && this.goingUp !== 'down' && !elevatorIsFree ? true : false}"
         :style="{
             transition: time + 's',
-            bottom: this.coordinate
+            bottom: this.coordinate,
+            height: `${100 / this.numberFloors - 1}vh`
         }"
         >
         <p v-if="this.goingUp === 'up'" class="scoreboard scoreboard--up">{{toFloor}}</p>
@@ -19,7 +20,8 @@
         name: 'elevator',
         props: {
             time: Number,
-            toFloor: Number
+            toFloor: Number,
+            numberFloors: Number
         },
         computed: {
             ...mapState(['elevatorIsFree', 'coordinate', 'goingUp']),

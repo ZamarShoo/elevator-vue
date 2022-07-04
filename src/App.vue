@@ -1,13 +1,19 @@
 <template>
+<my-input
+      :modelValue="this.numberFloors"
+      @update:modelValue="this.setNumberOfFloors"
+    />
 <div class="house">
   <div class="floor-left">
     <elevator
       :time="this.getCoordinate.time"
       :to-floor="this.getCoordinate.toFloor"
+      :number-floors="this.numberFloors"
     />
     <div
       v-for="n in numberFloors"
       :key="n" 
+      :style="{height: `${100 / this.numberFloors - 1}vh`}"
       class="floor">
     </div>
   </div>
@@ -22,20 +28,22 @@
 
 <script>
 import { onUnmounted } from "vue"
-import { mapState, mapGetters, mapActions } from 'vuex'
+import { mapState, mapGetters, mapActions, mapMutations } from 'vuex'
 import Elevator from '@/components/Elevator.vue'
 import Floor from '@/components/Floor.vue'
+import MyInput from '@/components/MyInput.vue'
 
 export default {
   name: 'App',
   components: {
-    Elevator, Floor
+    Elevator, Floor, MyInput
   },
   computed: {
     ...mapState(['numberFloors', 'turnFloors']),
     ...mapGetters(['getCoordinate'])
   },
   methods: {
+      ...mapMutations(['setNumberOfFloors']),
       ...mapActions(['nextFloor', 'saveToStorage', 'getToStorage']),
   },
   mounted() {
@@ -43,9 +51,9 @@ export default {
       this.getToStorage()
     }
     this.$store.watch(() => this.$store.getters.getCoordinate, (n) => {
-        if (n.elevatorIsFree) {
-          this.nextFloor(this.getCoordinate.time)
-        }
+      if (n.elevatorIsFree) {
+        this.nextFloor(this.getCoordinate.time)
+      }
     }),
     window.addEventListener( 'beforeunload', e => this.saveToStorage() );
   },

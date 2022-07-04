@@ -2,6 +2,7 @@
     <div
       v-for="n in numberFloors"
       :key="n" 
+      :style="{height: `${100 / this.numberFloors - 1}vh`}"
       class="floor">
         <p class="floor-number">{{n}}</p>
         <p 
@@ -18,7 +19,7 @@
         name: 'floor',
         props: {
             numberFloors: Number,
-            turnFloors: Array
+            turnFloors: Array,
         },
         methods: {
             ...mapActions(['changeFloor']),
